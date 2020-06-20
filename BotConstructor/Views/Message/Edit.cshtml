@@ -1,0 +1,41 @@
+﻿@model BotConstructor.Web.Models.Message.MessageViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>MessageViewModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="Id" hidden />
+            <div class="form-group">
+                <label asp-for="InputMessage" class="control-label"></label>
+                <input asp-for="InputMessage" class="form-control" />
+                <span asp-validation-for="InputMessage" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OutputMessage" class="control-label"></label>
+                <input asp-for="OutputMessage" class="form-control" />
+                <span asp-validation-for="OutputMessage" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BotId" class="control-label"></label>
+                @Html.DropDownListFor(x => x.BotId, Model.Bots)
+                <span asp-validation-for="BotId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="List">Back to List</a>
+</div>
+

@@ -1,0 +1,37 @@
+﻿@model List<BotConstructor.Web.Models.Bot.BotListViewModel>
+@{
+    ViewData["Title"] = "List";
+}
+
+<h1>List</h1>
+
+@await Html.PartialAsync("NewBotPartial", new BotConstructor.Web.Models.Bot.BotViewModel())
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var bot in Model)
+        {
+            <tr>
+                <td>@bot.Id</td>
+                <td>@bot.Name</td>
+                <td class="text-right">
+                    @if(bot.IsWorking)
+                    {
+                        <a asp-action="StopBot" asp-controller="Bot" asp-route-id="@bot.Id" class="btn btn-danger btn-sm">Stop</a>
+                    }
+                    else
+                    {
+                        <a asp-action="StartBot" asp-controller="Bot" asp-route-id="@bot.Id" class="btn btn-success btn-sm">Start</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
