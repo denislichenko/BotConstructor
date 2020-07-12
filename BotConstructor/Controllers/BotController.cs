@@ -30,6 +30,33 @@ namespace BotConstructor.Web.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> Edit(int id)
+        {
+            if(id > 0)
+            {
+                var bot = await _context.Bots.Include(x => x.Messages).FirstOrDefaultAsync(x => x.Id == id);
+                if (bot != null)
+                {
+                    var model = new BotEditViewModel
+                    {
+                        Id = bot.Id,
+                        Token = bot.Token,
+                        Name = bot.Title,
+                        Messages = bot.Messages.Select(x => new BotMessage
+                        {
+                            Id = x.Id,
+                            InputMessage = x.InputMessage,
+                            OutputMessage = x.OutputMessage
+                        }).ToList() 
+                    };
+                    return View(model);
+                }
+            }
+
+            return RedirectToAction("List"); 
+        }
+
+
         public async Task<IActionResult> AddBot(BotViewModel model)
         {
             BotControl control = new BotControl();

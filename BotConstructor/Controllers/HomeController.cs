@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using BotConstructor.Models;
 
-namespace BotConstructor.Controllers
+namespace BotConstructor.Web.Controllers
 {
     public class HomeController : Controller
     {

@@ -20,7 +20,7 @@
         {
             <tr>
                 <td>@bot.Id</td>
-                <td>@bot.Name</td>
+                <td><a asp-action="Edit" asp-controller="Bot" asp-route-id="@bot.Id">@bot.Name</a></td>
                 <td class="text-right">
                     @if(bot.IsWorking)
                     {

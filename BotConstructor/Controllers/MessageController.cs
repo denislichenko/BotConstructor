@@ -19,9 +19,35 @@ namespace BotConstructor.Web.Controllers
             _context = context;
         }
 
-        public IActionResult List()
+        public IActionResult Create(int botId)
         {
-            return View(_context.Messages.Include(x => x.Bot).ToList());
+            if (botId > 0)
+            {
+                var model = new MessageViewModel { BotId = botId };
+                return View(model); 
+            }
+
+            return RedirectToAction("List");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(MessageViewModel model)
+        {
+            if(ModelState.IsValid)
+            {
+                await _context.Messages.AddAsync(new Message
+                {
+                    InputMessage = model.InputMessage,
+                    OutputMessage = model.OutputMessage,
+                    BotId = model.BotId
+                });
+
+                await _context.SaveChangesAsync();
+
+                return Redirect(Url.Action("Edit", "Bot", new { id = model.BotId })); 
+            }
+
+            return View(model);
         }
 
         public async Task<IActionResult> Edit(int id = 0)
