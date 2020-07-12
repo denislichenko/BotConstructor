@@ -1,4 +1,5 @@
 ﻿using BotConstructor.Database.Models;
+using BotConstructor.Database.Models.QuizModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -39,13 +40,13 @@ namespace BotConstructor.Bot
         {
             var message = messageEventArgs.Message.Text.Split(' ').First();
 
-            await CreateUserIfNew(messageEventArgs.Message.Chat.Id, messageEventArgs.Message.Chat.Username); 
+            await CreateUserIfNew(messageEventArgs.Message.Chat.Id, messageEventArgs.Message.Chat.Username);
 
-            //if (message == null || message.Type != MessageType.Text) return;
+            var isQuiz = context.Quizzes.Any(x => x.Bot.BotId == client.BotId && x.TriggerCommand == message) ||
+                         context.Chats.First(x => x.ChatId == messageEventArgs.Message.Chat.Id).IsActiveQuiz; 
 
-            var answer = context.Messages.Include(x => x.Bot).FirstOrDefault(x => x.Bot.BotId == client.BotId && x.InputMessage == message);
-            if(answer != null) await client.SendTextMessageAsync(messageEventArgs.Message.Chat.Id, answer.OutputMessage); 
-            else await client.SendTextMessageAsync(messageEventArgs.Message.Chat.Id, "???"); 
+            if(isQuiz) await QuizMessage(messageEventArgs.Message); 
+            else await TextMessage(messageEventArgs.Message); 
         }
 
         public async Task CreateUserIfNew(long chatId, string userName)
@@ -56,6 +57,61 @@ namespace BotConstructor.Bot
                 var botId = (await context.Bots.FirstAsync(x => x.BotId == client.BotId)).Id;
                 await context.Chats.AddAsync(new Chat { ChatId = chatId, UserName = userName, BotId = botId });
                 await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task TextMessage(Telegram.Bot.Types.Message msg)
+        {
+            var answer = await context.Messages.Include(x => x.Bot).FirstOrDefaultAsync(x => x.Bot.BotId == client.BotId && x.InputMessage == msg.Text);
+            if (answer == null) await client.SendTextMessageAsync(msg.Chat.Id, "???");
+            else await client.SendTextMessageAsync(msg.Chat.Id, answer.OutputMessage); 
+        }
+
+        public async Task QuizMessage(Telegram.Bot.Types.Message msg)
+        {
+            var chat = await context.Chats.FirstAsync(x => x.ChatId == msg.Chat.Id);
+            var quiz = await context.Quizzes.Include(x => x.QuizSteps).Where(x => x.Bot.BotId == client.BotId).FirstAsync();
+
+            StartQuizIfNot(chat, quiz.Id);
+            SaveMessage(msg, chat, quiz.Id);
+
+            string answer = quiz.QuizSteps.FirstOrDefault(x => x.StepNumber == chat.QuizStepNumber).Text;
+
+            if (chat.QuizStepNumber == quiz.QuizSteps.Max(x => x.StepNumber))
+                StopQuiz(chat);
+            else chat.QuizStepNumber++;
+
+            await context.SaveChangesAsync(); 
+
+            await client.SendTextMessageAsync(msg.Chat.Id, answer);
+        }
+
+        public void StartQuizIfNot(Chat chat, int quizId)
+        {
+            if (!chat.IsActiveQuiz)
+            {
+                chat.IsActiveQuiz = true;
+                chat.QuizId = quizId;
+                chat.QuizStepNumber = 1; 
+            }
+        }
+
+        public void StopQuiz(Chat chat)
+        {
+            chat.IsActiveQuiz = false;
+            chat.QuizId = null;
+            chat.QuizStepNumber = null;
+        }
+
+        public void SaveMessage(Telegram.Bot.Types.Message msg, Chat chat, int quizId)
+        {
+            if(chat.QuizStepNumber > 1)
+            {
+                context.QuizAnswers.Add(new QuizAnswer
+                {
+                    QuizStepId = context.QuizSteps.First(x => x.QuizId == chat.QuizId && x.StepNumber == chat.QuizStepNumber).Id,
+                    Text = msg.Text
+                }); 
             }
         }
     }

@@ -48,7 +48,8 @@ namespace BotConstructor.Web.Controllers
                 await _context.Quizzes.AddAsync(new Quiz
                 {
                     BotId = model.BotId, 
-                    Name = model.Name
+                    Name = model.Name, 
+                    TriggerCommand = model.TriggerCommand
                 });
                 await _context.SaveChangesAsync();
                 return RedirectToAction("List", new { botId = model.BotId }); 
@@ -69,6 +70,7 @@ namespace BotConstructor.Web.Controllers
                         Id = quiz.Id,
                         BotId = quiz.BotId,
                         Name = quiz.Name,
+                        TriggerCommand = quiz.TriggerCommand,
                         Steps = quiz.QuizSteps.Select(x => new QuizStepViewModel
                         {
                             Id = x.Id, 
@@ -92,7 +94,8 @@ namespace BotConstructor.Web.Controllers
                 var quiz = await _context.Quizzes.FirstOrDefaultAsync(x => x.Id == model.Id); 
                 if(quiz != null)
                 {
-                    quiz.Name = model.Name; 
+                    quiz.Name = model.Name;
+                    quiz.TriggerCommand = model.TriggerCommand;
                 }
 
                 await _context.SaveChangesAsync();
@@ -130,7 +133,8 @@ namespace BotConstructor.Web.Controllers
                 {
                     Name = model.Name, 
                     Text = model.Text,
-                    QuizId = model.QuizId
+                    QuizId = model.QuizId,
+                    StepNumber = model.StepNumber
                 });
 
                 await _context.SaveChangesAsync();
@@ -150,7 +154,8 @@ namespace BotConstructor.Web.Controllers
                     Id = step.Id,
                     QuizId = step.QuizId,
                     Name = step.Name,
-                    Text = step.Text
+                    Text = step.Text,
+                    StepNumber = step.StepNumber
                 }); 
             }
             return RedirectToAction("List");
@@ -167,6 +172,7 @@ namespace BotConstructor.Web.Controllers
                     step.QuizId = model.QuizId;
                     step.Name = model.Name;
                     step.Text = model.Text;
+                    step.StepNumber = model.StepNumber;
                     await _context.SaveChangesAsync();
 
                     return RedirectToAction("Edit", new { id = model.QuizId }); 

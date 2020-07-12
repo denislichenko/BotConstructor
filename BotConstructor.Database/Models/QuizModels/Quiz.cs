@@ -8,6 +8,7 @@ namespace BotConstructor.Database.Models.QuizModels
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public string TriggerCommand { get; set; }
 
         public int BotId { get; set; }
         public Bot Bot { get; set; }

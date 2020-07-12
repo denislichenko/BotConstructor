@@ -14,8 +14,7 @@ namespace BotConstructor.Database.Models
         public bool IsActiveQuiz { get; set; }
         public int? QuizId { get; set; }
         public Quiz Quiz { get; set; }
-        public int? QuizStepId { get; set;}
-        public QuizStep Step { get; set; }
+        public int? QuizStepNumber { get; set;}
 
         public int BotId { get; set; }
         public Bot Bot { get; set; }
