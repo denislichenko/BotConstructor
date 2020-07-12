@@ -52,8 +52,10 @@ namespace BotConstructor.Database.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    BotId = table.Column<int>(nullable: false),
                     Token = table.Column<string>(nullable: true),
-                    Title = table.Column<string>(nullable: true)
+                    Title = table.Column<string>(nullable: true),
+                    isWorking = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -167,26 +169,6 @@ namespace BotConstructor.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Chats",
-                columns: table => new
-                {
-                    ChatId = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserName = table.Column<string>(nullable: true),
-                    BotId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Chats", x => x.ChatId);
-                    table.ForeignKey(
-                        name: "FK_Chats_Bots_BotId",
-                        column: x => x.BotId,
-                        principalTable: "Bots",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Messages",
                 columns: table => new
                 {
@@ -203,6 +185,103 @@ namespace BotConstructor.Database.Migrations
                         name: "FK_Messages_Bots_BotId",
                         column: x => x.BotId,
                         principalTable: "Bots",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Quizzes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(nullable: true),
+                    BotId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Quizzes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Quizzes_Bots_BotId",
+                        column: x => x.BotId,
+                        principalTable: "Bots",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "QuizSteps",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(nullable: true),
+                    Text = table.Column<string>(nullable: true),
+                    QuizId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuizSteps", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_QuizSteps_Quizzes_QuizId",
+                        column: x => x.QuizId,
+                        principalTable: "Quizzes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Chats",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ChatId = table.Column<long>(nullable: false),
+                    UserName = table.Column<string>(nullable: true),
+                    IsActiveQuiz = table.Column<bool>(nullable: false),
+                    QuizId = table.Column<int>(nullable: true),
+                    QuizStepId = table.Column<int>(nullable: true),
+                    BotId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Chats", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Chats_Bots_BotId",
+                        column: x => x.BotId,
+                        principalTable: "Bots",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Chats_Quizzes_QuizId",
+                        column: x => x.QuizId,
+                        principalTable: "Quizzes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Chats_QuizSteps_QuizStepId",
+                        column: x => x.QuizStepId,
+                        principalTable: "QuizSteps",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "QuizAnswers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Text = table.Column<string>(nullable: true),
+                    QuizStepId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuizAnswers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_QuizAnswers_QuizSteps_QuizStepId",
+                        column: x => x.QuizStepId,
+                        principalTable: "QuizSteps",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -252,8 +331,33 @@ namespace BotConstructor.Database.Migrations
                 column: "BotId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Chats_QuizId",
+                table: "Chats",
+                column: "QuizId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Chats_QuizStepId",
+                table: "Chats",
+                column: "QuizStepId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Messages_BotId",
                 table: "Messages",
+                column: "BotId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuizAnswers_QuizStepId",
+                table: "QuizAnswers",
+                column: "QuizStepId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuizSteps_QuizId",
+                table: "QuizSteps",
+                column: "QuizId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Quizzes_BotId",
+                table: "Quizzes",
                 column: "BotId");
         }
 
@@ -281,10 +385,19 @@ namespace BotConstructor.Database.Migrations
                 name: "Messages");
 
             migrationBuilder.DropTable(
+                name: "QuizAnswers");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "QuizSteps");
+
+            migrationBuilder.DropTable(
+                name: "Quizzes");
 
             migrationBuilder.DropTable(
                 name: "Bots");

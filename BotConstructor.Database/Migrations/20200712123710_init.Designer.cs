@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BotConstructor.Database.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20200712111110_quizzes")]
-    partial class quizzes
+    [Migration("20200712123710_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -47,20 +47,36 @@ namespace BotConstructor.Database.Migrations
 
             modelBuilder.Entity("BotConstructor.Database.Models.Chat", b =>
                 {
-                    b.Property<long>("ChatId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("BotId")
                         .HasColumnType("int");
 
+                    b.Property<long>("ChatId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsActiveQuiz")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("QuizId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("QuizStepId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ChatId");
+                    b.HasKey("Id");
 
                     b.HasIndex("BotId");
+
+                    b.HasIndex("QuizId");
+
+                    b.HasIndex("QuizStepId");
 
                     b.ToTable("Chats");
                 });
@@ -199,6 +215,9 @@ namespace BotConstructor.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("QuizId")
                         .HasColumnType("int");
@@ -351,6 +370,14 @@ namespace BotConstructor.Database.Migrations
                         .HasForeignKey("BotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("BotConstructor.Database.Models.QuizModels.Quiz", "Quiz")
+                        .WithMany("Chats")
+                        .HasForeignKey("QuizId");
+
+                    b.HasOne("BotConstructor.Database.Models.QuizModels.QuizStep", "Step")
+                        .WithMany("Chats")
+                        .HasForeignKey("QuizStepId");
                 });
 
             modelBuilder.Entity("BotConstructor.Database.Models.Message", b =>

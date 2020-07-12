@@ -12,6 +12,7 @@ namespace BotConstructor.Database.Models.QuizModels
         public int QuizId { get; set; }
         public Quiz Quiz { get; set; }
 
+        public ICollection<Chat> Chats { get; set; }
         public ICollection<QuizAnswer> QuizAnswers { get; set; }
     }
 }
