@@ -1,4 +1,5 @@
 ﻿using BotConstructor.Database.Models.Identity;
+using BotConstructor.Database.Models.QuizModels;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,6 +13,9 @@ namespace BotConstructor.Database.Models
         public DbSet<Bot> Bots { get; set; }
         public DbSet<Chat> Chats { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<Quiz> Quizzes { get; set; }
+        public DbSet<QuizStep> QuizSteps { get; set; }
+        public DbSet<QuizAnswer> QuizAnswers { get; set; }
 
         public ApplicationContext() { }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options) { }

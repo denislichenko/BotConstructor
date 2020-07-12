@@ -1,0 +1,22 @@
+﻿@model BotConstructor.Web.Models.Quiz.QuizEditViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h3>Create Quiz </h3>
+<hr />
+<form asp-action="Create" asp-controller="Quiz" method="post" class="mt-3">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for="BotId" type="hidden" />
+    <div class="form-group row">
+        <label class="col-form-label col-2">Name:</label>
+        <div class="col-10">
+            <input asp-for="Name" class="form-control" type="text" />
+        </div>
+    </div>
+    <div>
+        <button class="btn btn-success">Save</button>
+        <a asp-action="List" asp-controller="Quiz" asp-route-botId="@Model.BotId" class="btn btn-link">Cancel</a>
+    </div>
+</form>

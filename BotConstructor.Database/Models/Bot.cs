@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BotConstructor.Database.Models.QuizModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,6 +14,7 @@ namespace BotConstructor.Database.Models
         public bool isWorking { get; set; }
 
         public List<Chat> Chats { get; set; }
+        public List<Quiz> Quizzes { get; set; }
         public List<Message> Messages { get; set; }
     }
 }

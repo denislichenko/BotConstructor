@@ -13,6 +13,7 @@
         <form asp-action="Edit" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input asp-for="Id" hidden />
+            <input asp-for="BotId" hidden />
             <div class="form-group">
                 <label asp-for="InputMessage" class="control-label"></label>
                 <input asp-for="InputMessage" class="form-control" />

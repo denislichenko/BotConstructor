@@ -1,0 +1,29 @@
+﻿@model BotConstructor.Web.Models.Quiz.QuizListViewModel
+@{
+    ViewData["Title"] = "List";
+}
+
+<h3 class="d-flex justify-content-between">
+    Quizzes
+    <a asp-action="Create" asp-controller="Quiz" asp-route-botId="@Model.BotId" class="btn btn-success btn-sm">New Quiz</a>
+</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <td>Id</td>
+            <td>Name</td>
+            <td>Action</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var quiz in Model.Quizzes)
+        {
+            <tr>
+                <td>@quiz.Id</td>
+                <td><a asp-action="Edit" asp-controller="Quiz" asp-route-id="@quiz.Id">@quiz.Name</a></td>
+                <td><a asp-action="Delete" asp-controller="Quiz" asp-route-id="@quiz.Id" class="btn btn-danger btn-sm">Delete</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
