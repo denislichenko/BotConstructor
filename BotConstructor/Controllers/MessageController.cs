@@ -19,6 +19,22 @@ namespace BotConstructor.Web.Controllers
             _context = context;
         }
 
+        public async Task<IActionResult> List(int botId)
+        {
+            if (botId > 0)
+            {
+                var messageList = await _context.Messages.Where(x => x.BotId == botId).ToListAsync();
+                var model = new MessageListViewModel
+                {
+                    BotId = botId,
+                    Messages = messageList
+                }; 
+
+                return View(model);
+            }
+            return Redirect(Url.Action("List", "Bot"));
+        }
+
         public IActionResult Create(int botId)
         {
             if (botId > 0)
@@ -44,26 +60,31 @@ namespace BotConstructor.Web.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return Redirect(Url.Action("Edit", "Bot", new { id = model.BotId })); 
+                return RedirectToAction("List", new { botId = model.BotId });
             }
 
             return View(model);
         }
 
-        public async Task<IActionResult> Edit(int id = 0)
-        {
-            var model = new MessageViewModel();
+        public async Task<IActionResult> Edit(int id)
+        {       
             if(id > 0)
             {
                 var msg = await _context.Messages.FirstOrDefaultAsync(x => x.Id == id);
-                model.Id = msg.Id;
-                model.InputMessage = msg.InputMessage;
-                model.OutputMessage = msg.OutputMessage;
-                model.BotId = msg.BotId; 
+                if(msg != null)
+                {
+                    var model = new MessageViewModel
+                    {
+                        Id = msg.Id,
+                        InputMessage = msg.InputMessage,
+                        OutputMessage = msg.OutputMessage,
+                        BotId = msg.BotId
+                    };
+                    return View(model);
+                }  
             }
-            model.Bots = _context.Bots.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Title }).ToList();
 
-            return View(model); 
+            return RedirectToAction("List");
         }
 
         [HttpPost]
@@ -71,26 +92,33 @@ namespace BotConstructor.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                Message msg;
+                var msg = await _context.Messages.FirstAsync(x => x.Id == model.Id);
 
-                if (model.Id > 0) 
-                    msg = await _context.Messages.FirstAsync(x => x.Id == model.Id);
-                else
+                if(msg != null)
                 {
-                    msg = new Message();
-                    _context.Messages.Add(msg); 
-                }
+                    msg.InputMessage = model.InputMessage;
+                    msg.OutputMessage = model.OutputMessage;
+                    msg.BotId = model.BotId;
 
-                msg.InputMessage = model.InputMessage;
-                msg.OutputMessage = model.OutputMessage;
-                msg.BotId = model.BotId;
+                    await _context.SaveChangesAsync();
+                }               
 
+                return RedirectToAction("List", new { botId = model.BotId});
+            }
+            return View(model);
+        }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            var message = await _context.Messages.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (message != null)
+            {
+                _context.Messages.Remove(message);
                 await _context.SaveChangesAsync();
-
-                return RedirectToAction("List");
             }
 
-            return View(model);
+            return RedirectToAction("List", new { botId = message.BotId }); 
         }
     }
 }

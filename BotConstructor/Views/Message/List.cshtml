@@ -1,0 +1,27 @@
+﻿@model BotConstructor.Web.Models.Message.MessageListViewModel
+@{
+    ViewData["Title"] = "List";
+}
+
+<h3 class="d-flex justify-content-between">
+    Messages List
+    <a asp-action="Create" asp-controller="Message" asp-route-botId="@Model.BotId" class="btn btn-success btn-sm">New Message</a>
+</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <td>Input</td>
+            <td>Actions</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var message in Model.Messages)
+        {
+            <tr>
+                <td><a asp-action="Edit" asp-controller="Message" asp-route-id="@message.Id">@message.InputMessage</a></td>
+                <td><a asp-action="Delete" asp-controller="Message" asp-route-id="@message.Id" class="btn btn-danger btn-sm">Delete</a></td>
+            </tr>
+        }
+    </tbody>
+</table>

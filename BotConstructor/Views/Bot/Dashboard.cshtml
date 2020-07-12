@@ -1,0 +1,19 @@
+﻿@model BotConstructor.Web.Models.Bot.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h3>Dashboard - @Model.BotName</h3>
+<hr />
+
+<ul class="nav flex-column">
+    <li class="nav-item">
+        <a class="nav-link" asp-action="Edit" asp-controller="Bot" asp-route-id="@Model.BotId">General</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" asp-action="List" asp-controller="Message" asp-route-botId="@Model.BotId">Messages</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" asp-action="List" asp-controller="Quiz" asp-route-botId="@Model.BotId">Quizes</a>
+    </li>
+</ul>

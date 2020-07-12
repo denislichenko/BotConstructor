@@ -30,6 +30,17 @@ namespace BotConstructor.Web.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> Dashboard(int id)
+        {
+            if(id > 0)
+            {
+                var bot = await _context.Bots.FirstOrDefaultAsync(x => x.Id == id);
+                if(bot != null) return View(new DashboardViewModel { BotId = bot.Id, BotName = bot.Title });
+            }
+
+            return RedirectToAction("List"); 
+        }
+
         public async Task<IActionResult> Edit(int id)
         {
             if(id > 0)
@@ -57,12 +68,15 @@ namespace BotConstructor.Web.Controllers
         }
 
 
+        [HttpPost]
         public async Task<IActionResult> AddBot(BotViewModel model)
         {
             BotControl control = new BotControl();
             await _context.Bots.AddAsync(new Database.Models.Bot { 
                 BotId = control.StartBot(model.Token), 
-                isWorking = true
+                isWorking = true,
+                Title = model.Name, 
+                Token = model.Token
             });
             await _context.SaveChangesAsync(); 
             return RedirectToAction("List"); 
